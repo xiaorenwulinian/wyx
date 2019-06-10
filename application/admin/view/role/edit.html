@@ -1,0 +1,233 @@
+{extend name="admin@layout/basic" /}
+{block name="style"}
+<style>
+    .is_hidden {
+        display: none;
+    }
+</style>
+{/block}
+<link rel="stylesheet" href="__STATIC__/css/admin/public.css" media="all"/>
+{block name="content"}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        {$_page_title}
+        <small> <a href="{$_page_btn_link}" class="pull-right">{$_page_btn_name}</a></small>
+    </h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title"></h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <form class="form-horizontal" id="formSubmit" action="">
+                        <input type="hidden" name="id" value="{$roleData.id}">
+                        <div class="form-group">
+                            <label for="role_name" class="col-sm-2 control-label">角色名称</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" name="role_name" id="role_name" value="{$roleData.role_name}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label">权限列表：</label>
+                            <div class="col-sm-8">
+                                <?php foreach ($priData as $k => $v):
+                                     if (in_array($v['id'],$priIdsData)) {
+                                        $checked = "checked='checked'";
+                                     } else {
+                                        $checked = "";
+                                     }
+                                ?>
+
+
+                                    <?php echo str_repeat('-', $v['level'] * 12); ?>
+                                    <input level="{$v.level}" type="checkbox" name="pri_id[]" value="{$v.id}" {$checked} />
+                                    <span level="{$v.level}" class="level_show">{$v.pri_name}</span> <br/>
+
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="curSubmit" class="btn btn-default">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div style="margin-bottom: 100px;"></div>
+{/block}
+
+{block name="script"}
+<script>
+   $(function () {
+
+       $('.curSubmit').on('click',function () {
+           var role_name = $('#role_name').val();
+           if (role_name == null || role_name.length == 0) {
+               alert('角色名称必填');
+               return false;
+           }
+
+           var url = "<?php echo url('edit','',false);?>";
+           var form_param = $('#formSubmit').serialize();
+           console.log(form_param);
+           $.ajax({
+               type: 'post',
+               url:  url,
+               dataType: 'json',
+               data: form_param,
+               success: function(ret){
+                   console.log(ret);
+                   if(ret.code == 0) {
+                       layer.msg('修改成功',{
+                           time:1000,
+                           icon: 6,
+                           end:function () {
+//                               history.go(-1);
+                               location.href = "<?php echo url('lst?&page='.input('page')); ?>";
+                           }
+                       })
+                   } else {
+                       layer.msg(ret.msg, {icon: 5,time:1000,});
+                       return false;
+                   }
+               },
+               error: function (XMLHttpRequest, textStatus, errorThrown) {
+                   console.log('---error----\n');
+                   console.log(XMLHttpRequest);
+                   console.log(XMLHttpRequest.status);
+                   console.log(XMLHttpRequest.readyState);
+                   console.log(XMLHttpRequest.responseJSON);
+                   console.log(XMLHttpRequest.responseText);
+                   console.log(textStatus);
+                   console.log(errorThrown);
+                   layer.msg(XMLHttpRequest.responseJSON.msg, {icon: 5,time:1000,});
+                   return false;
+               }
+
+           });
+           return false;
+       });
+       /*
+       点击隐藏和显示子级
+       $(".level_show").on('click',function () {
+           // 先取出当前权限的level值是多少
+           var cur_level = $(this).attr("level");
+           $(this).nextAll().each(function () {
+                if ($(this).attr('level') >= cur_level) {
+                    return false;
+                } else {
+                    if ($(this).hasClass('is_hidden')) {
+                        $(this).removeClass('is_hidden');
+                    } else {
+                        $(this).addClass('is_hidden');
+                    }
+                }
+           });
+
+           */
+
+           // 判断是选中还是取消
+           if($(this).is(":checked")) {
+               var tmplevel = cur_level; // 给一个临时的变量后面要进行减操作
+               // 先取出这个复选框所有前面的复选框
+               var allprev = $(this).prevAll(":checkbox");
+               // 循环每一个前面的复选框判断是不是上级的
+               $(allprev).each(function(k,v){
+                   // 判断是不是上级的权限
+                   if($(v).attr("level") < tmplevel) {
+                       tmplevel--; // 再向上提一级
+                       $(v).prop("checked", "checked");
+                   }
+               });
+               // 所有子权限也选中
+               // 先取出这个复选框所有前面的复选框
+               var allprev = $(this).nextAll(":checkbox");
+               // 循环每一个前面的复选框判断是不是上级的
+               $(allprev).each(function(k,v){
+                   // 判断是不是上级的权限
+                   if($(v).attr("level") > cur_level) {
+                       $(v).prop("checked", "checked");
+                   }
+                   else {
+                       return false;   // 遇到一个平级的权限就停止循环后面的不用再判断了
+                   }
+               });
+           }
+           else {
+               // 先取出这个复选框所有后面的复选框
+               var allprev = $(this).nextAll(":checkbox");
+               // 循环每一个后面的复选框判断是不是下级的
+               $(allprev).each(function(k,v){
+                   // 判断是不是上级的权限
+                   if($(v).attr("level") > cur_level) {
+                       $(v).prop("checked",false);
+                   }
+                   else {
+                       return false;   // 遇到一个平级的权限就停止循环后面的不用再判断了
+                   }
+               });
+           }
+       });
+       // 为所有的选择框绑定点击事件
+       $(":checkbox").click(function(){
+           // 先取出当前权限的level值是多少
+           var cur_level = $(this).attr("level");
+           // 判断是选中还是取消
+           if($(this).is(":checked")) {
+               var tmplevel = cur_level; // 给一个临时的变量后面要进行减操作
+               // 先取出这个复选框所有前面的复选框
+               var allprev = $(this).prevAll(":checkbox");
+               // 循环每一个前面的复选框判断是不是上级的
+               $(allprev).each(function(k,v){
+                   // 判断是不是上级的权限
+                   if($(v).attr("level") < tmplevel) {
+                       tmplevel--; // 再向上提一级
+                       $(v).prop("checked", "checked");
+                   }
+               });
+               // 所有子权限也选中
+               // 先取出这个复选框所有前面的复选框
+               var allprev = $(this).nextAll(":checkbox");
+               // 循环每一个前面的复选框判断是不是上级的
+               $(allprev).each(function(k,v){
+                   // 判断是不是上级的权限
+                   if($(v).attr("level") > cur_level) {
+                       $(v).prop("checked", "checked");
+                   }
+                   else {
+                       return false;   // 遇到一个平级的权限就停止循环后面的不用再判断了
+                   }
+               });
+           }
+           else {
+               // 先取出这个复选框所有后面的复选框
+               var allprev = $(this).nextAll(":checkbox");
+               // 循环每一个后面的复选框判断是不是下级的
+               $(allprev).each(function(k,v){
+                   // 判断是不是上级的权限
+                   if($(v).attr("level") > cur_level) {
+                       $(v).prop("checked",false);
+                   }
+                   else {
+                       return false;   // 遇到一个平级的权限就停止循环后面的不用再判断了
+                   }
+               });
+           }
+       });
+
+   })
+</script>
+{/block}

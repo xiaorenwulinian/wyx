@@ -1,0 +1,164 @@
+{extend name="admin@layout/basic" /}
+{block name="style"}{/block}
+<link rel="stylesheet" href="__STATIC__/css/admin/public.css" media="all"/>
+{block name="content"}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        {$_page_title}
+        <small> <a href="{$_page_btn_link}" class="pull-right">{$_page_btn_name}</a></small>
+    </h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box" >
+                <div class="box-header">
+                    <h3 class="box-title">
+                    </h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="example2" class="table table-bordered table-hover">
+                        <thead>
+                        <tr >
+                            <th style="text-align: center">id</th>
+                            <th style="text-align: center">名称</th>
+                            <th style="text-align: center">是否可用</th>
+                            <th style="text-align: center">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach($list as $v):?>
+                            <tr  style="width: 40px;text-align: center">
+                                <td>{$v->id}</td>
+                                <td>{$v->username}</td>
+                                <td>
+                                    <?php if($v->id != 1):?>
+                                    <span data-id="{$v->id}" class="edit_use">
+                                        <?php if($v['is_use'] == 0):?>
+                                            <input class="btn btn-primary" type="button" value="可用">
+                                        <?php else:?>
+                                            <input class="btn btn-danger" type="button" value="禁用">
+                                        <?php endif;?>
+
+                                    </span>
+                                    <?php endif;?>
+                                </td>
+                                <td>
+                                    <a href="<?php echo url('edit?id='.$v['id'].'&page='.input('get.page')); ?>" title="编辑">编辑</a> |
+                                    <!--<a href="<?php echo url('delete?id='.$v['id'].'&p='.request()->param('p')); ?>" onclick="return confirm('确定要删除吗？');" title="移除">删除</a>-->
+                                    <a href="javascript:void(0)" data-id="{$v['id']}" class="cur_del" title="移除">删除</a>
+                                </td>
+                            </tr>
+                        <?php endforeach;?>
+                        </tbody>
+                    </table>
+                    {$page_show|raw}
+                </div>
+            </div>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+{/block}
+
+{block name="script"}
+<script>
+   $(function () {
+       $('.cur_del').on('click',function () {
+           var id = $(this).attr('data-id');
+           layer.confirm('确定要删除吗？', {
+               btn: ['确定','取消']
+           }, function(){
+               var url = "<?php echo url('flowerUse/delete','',false);?>";
+               $.ajax({
+                   type: 'get',
+                   url:  url,
+                   dataType: 'json',
+                   data: {id:id},
+                   success: function(ret){
+                       console.log(ret);
+                       if(ret.code == 0) {
+                           layer.msg('删除成功',{
+                               time:1000, icon: 6,
+                               end:function () {
+                                   location.href = location.href;
+                               }
+                           })
+                       } else {
+                           layer.msg(ret.msg, {icon: 5,time:1000,});
+                           return false;
+                       }
+                   }
+               });
+           }, function(){
+           });
+           return false;
+       });
+       $('.edit_use').on('click',function () {
+           var id = $(this).attr('data-id');
+           var url = "<?php echo url('ajaxEditAdminUse','',false);?>";
+           $.ajax({
+               type: 'get',
+               url:  url,
+               dataType: 'json',
+               data: { id : id },
+               success: function(ret){
+                   console.log(ret);
+                   if(ret.code == 0) {
+                       layer.msg('修改成功',{
+                           time:1000, icon: 6,
+                           end:function () {
+                               location.href = location.href;
+                           }
+                       })
+                   } else {
+                       layer.msg(ret.msg, {icon: 5,time:1000,});
+                       return false;
+                   }
+               }
+           });
+           return false;
+       });
+       $('.edit_sort_id').on('blur',function () {
+           var id = $(this).attr('data-id');
+           var sort_id = $(this).val();
+           var reg =  /^\d+$/;
+           if (!(reg.test(sort_id))) {
+               layer.msg("排序请输入正整数!", {icon: 5,time:2000});
+               return false;
+           }
+           var url = "<?php echo url('flowerUse/edit_sort','',false);?>";
+           $.ajax({
+               type: 'get',
+               url:  url,
+               dataType: 'json',
+               data: {
+                   id : id,
+                   sort_id : parseInt(sort_id),
+               },
+               success: function(ret){
+                   console.log(ret);
+                   if(ret.code == 0) {
+                       layer.msg('修改成功',{
+                           time:1000, icon: 6,
+                           end:function () {
+                               location.href = location.href;
+                           }
+                       })
+                   } else {
+                       layer.msg(ret.msg, {icon: 5,time:1000,});
+                       return false;
+                   }
+               }
+           });
+           return false;
+       });
+   })
+</script>
+{/block}

@@ -1,0 +1,197 @@
+{extend name="admin@layout/basic" /}
+{block name="style"}
+<style>
+    .common_search {
+        margin: 10px auto;
+    }
+    .page_size_select{
+        width: 105px;
+        float: right;
+        display: inline-block;
+        padding-left: 0;
+        margin: 20px 10px;
+        border-radius: 4px;
+        padding: 6px 12px;
+        /*text-align: right;*/
+    }
+</style>
+
+{/block}
+<link rel="stylesheet" href="__STATIC__/css/admin/public.css" media="all"/>
+{block name="content"}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        {$_page_title}
+        <small> <a href="{$_page_btn_link}" class="pull-right">{$_page_btn_name}</a></small>
+    </h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="common_search">
+        <form class="form-inline" action="{:url('lst')}" id="form_search">
+            <input type="text" class="form-control" name="ad_title" placeholder="名称" value="{:input('ad_title')}">
+            <input  type="hidden" name="page_size" id="cur_show_page" value="{$page_size}"/>
+            <input class="btn btn-flat btn-primary" type="submit" value="搜索">
+            <!--<input class="btn btn-flat btn-primary m_10" onclick="location.href='{:url(\'lst\')}'" type="button" value="显示全部">-->
+            <!--<input class="btn btn-flat btn-warning m_10 select_del" type="button" value="批量删除">-->
+            <!--<a class="btn btn-flat btn-success m_10 f_r" href="{:url('add')}"><i class="fa fa-plus m-r-10"></i>添 加</a>-->
+        </form>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box" >
+                <div class="box-header">
+                    <h3 class="box-title">
+                    </h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="example2" class="table table-bordered table-hover">
+                        <thead>
+                        <tr >
+                            <th style="text-align: center">id</th>
+                            <th style="text-align: center">缩略图</th>
+                            <th style="text-align: center">标题</th>
+                            <th style="text-align: center">描述</th>
+                            <th style="text-align: center">跳转路径</th>
+                            <th style="text-align: center">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach($list as $v):?>
+                            <tr  style="width: 40px;text-align: center">
+                                <td>{$v['id']}</td>
+                                <td><img src="<?php echo '/uploads/'.$v['ad_thumb_img'];?>" width="50px" alt=""></td>
+                                <td>{$v['ad_title']}</td>
+                                <td>{$v['ad_content']}</td>
+                                <td>{$v['ad_url']}</td>
+                                <td>
+                                    <a href="<?php echo url('edit',['id'=>$v['id'],'page'=>input('page',1)],false); ?>" title="编辑">编辑</a> |
+                                    <!--<a href="<?php echo url('delete?id='.$v['id'].'&p='.request()->param('p')); ?>" onclick="return confirm('确定要删除吗？');" title="移除">删除</a>-->
+                                    <a href="javascript:void(0)" data-id="{$v['id']}" class="cur_del" title="移除">删除</a>
+                                </td>
+                            </tr>
+                        <?php endforeach;?>
+                        </tbody>
+                    </table>
+                    <div>
+                        {$page_show|raw}
+                        {$page_size_select|raw}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+{/block}
+
+{block name="script"}
+<script>
+   $(function () {
+       $('.cur_del').on('click',function () {
+           var id = $(this).attr('data-id');
+           layer.confirm('确定要删除吗？', {
+               btn: ['确定','取消']
+           }, function(){
+               var url = "<?php echo url('delete','',false);?>";
+               $.ajax({
+                   type: 'get',
+                   url:  url,
+                   dataType: 'json',
+                   data: {id:id},
+                   success: function(ret){
+                       console.log(ret);
+                       if(ret.code == 0) {
+                           layer.msg('删除成功',{
+                               time:1000, icon: 6,
+                               end:function () {
+                                   location.href = location.href;
+                               }
+                           })
+                       } else {
+                           layer.msg(ret.msg, {icon: 5,time:1000,});
+                           return false;
+                       }
+                   }
+               });
+           }, function(){
+           });
+           return false;
+       });
+       $('.edit_use').on('click',function () {
+           var id = $(this).attr('data-id');
+           var url = "<?php echo url('ajaxEditAdminUse','',false);?>";
+           $.ajax({
+               type: 'get',
+               url:  url,
+               dataType: 'json',
+               data: { id : id },
+               success: function(ret){
+                   console.log(ret);
+                   if(ret.code == 0) {
+                       layer.msg('修改成功',{
+                           time:1000, icon: 6,
+                           end:function () {
+                               location.href = location.href;
+                           }
+                       })
+                   } else {
+                       layer.msg(ret.msg, {icon: 5,time:1000,});
+                       return false;
+                   }
+               }
+           });
+           return false;
+       });
+       $('.edit_sort_id').on('blur',function () {
+           var id = $(this).attr('data-id');
+           var sort_id = $(this).val();
+           var reg =  /^\d+$/;
+           if (!(reg.test(sort_id))) {
+               layer.msg("排序请输入正整数!", {icon: 5,time:2000});
+               return false;
+           }
+           var url = "<?php echo url('edit_sort','',false);?>";
+           $.ajax({
+               type: 'get',
+               url:  url,
+               dataType: 'json',
+               data: {
+                   id : id,
+                   sort_id : parseInt(sort_id),
+               },
+               success: function(ret){
+                   console.log(ret);
+                   if(ret.code == 0) {
+                       layer.msg('修改成功',{
+                           time:1000, icon: 6,
+                           end:function () {
+                               location.href = location.href;
+                           }
+                       })
+                   } else {
+                       layer.msg(ret.msg, {icon: 5,time:1000,});
+                       return false;
+                   }
+               }
+           });
+           return false;
+       });
+
+       // 修改每页显示数量
+       $(".page_size_select").on('change',function() {
+           var page_size = $(this).val();
+           $('#cur_show_page').val(page_size);
+           $('#form_search').trigger('submit');
+           return false;
+          
+       });
+   })
+</script>
+{/block}

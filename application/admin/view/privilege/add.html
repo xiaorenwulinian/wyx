@@ -1,0 +1,142 @@
+{extend name="admin@layout/basic" /}
+{block name="style"}{/block}
+<link rel="stylesheet" href="__STATIC__/css/admin/public.css" media="all"/>
+{block name="content"}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+        {$_page_title}
+        <small> <a href="{$_page_btn_link}" class="pull-right">{$_page_btn_name}</a></small>
+    </h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title"></h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <form class="form-horizontal" id="formSubmit" action="">
+                        <div class="form-group">
+                            <label for="parent_id" class="col-sm-2 control-label">父级权限</label>
+                            <div class="col-sm-5">
+                                <select name="parent_id" id="parent_id" class="form-control">
+                                    <option value="0">顶级权限</option>
+                                    <?php foreach ($parentData as $k => $v): ?>
+                                        <option value="<?php echo $v['id']; ?>">
+                                            <?php echo str_repeat('-', 8*$v['level']).$v['pri_name']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pri_name" class="col-sm-2 control-label">权限名称：</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" name="pri_name" id="pri_name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="route_url" class="col-sm-2 control-label">路由地址：</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" name="route_url" id="route_url">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label">是否显示</label>
+                            <div class="col-sm-8">
+                                <label class="radio-inline">
+                                    <input type="radio" name="is_display" class="is_display" value="0" checked="checked" > 显示
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="is_display" class="is_display" value="1"  > 隐藏
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="curSubmit" class="btn btn-default">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<div style="margin-bottom: 100px;"></div>
+<!-- /.content -->
+{/block}
+
+{block name="script"}
+<script>
+   $(function () {
+       $('.curSubmit').on('click',function () {
+           var pri_name = $('#pri_name').val();
+           if (pri_name == '' || pri_name.length == 0) {
+               layer.msg("请输入权限名称!", {icon: 5,time:2000});
+               return false;
+           }
+           var route_url = $('#route_url').val();
+           if (route_url == '' || route_url.length == 0) {
+               layer.msg("请输入路由地址!", {icon: 5,time:2000});
+               return false;
+           }
+
+           var url = "<?php echo url('add','',false);?>";
+           var form_param = $('#formSubmit').serialize();
+           $.ajax({
+               type: 'post',
+               url:  url,
+               dataType: 'json',
+               data: form_param,
+               success: function(ret){
+                   console.log(ret);
+                   if(ret.code == 0) {
+                       layer.msg('添加成功',{
+                           time:1000,
+                           icon: 6,
+                           end:function () {
+//                               location.reload();
+                               location.href = "<?php echo url('lst','',false);?>";;
+                           }
+                       })
+                   } else {
+                       layer.msg(ret.msg, {icon: 5,time:1000,});
+                       return false;
+                   }
+               },
+               error: function (XMLHttpRequest, textStatus, errorThrown) {
+                   console.log('---error----\n');
+                   console.log(XMLHttpRequest);
+                   console.log(XMLHttpRequest.status);
+                   console.log(XMLHttpRequest.readyState);
+                   console.log(XMLHttpRequest.responseJSON);
+                   console.log(XMLHttpRequest.responseText);
+                   console.log(textStatus);
+                   console.log(errorThrown);
+                   layer.msg(XMLHttpRequest.responseJSON.msg, {icon: 5,time:1000,});
+                   return false;
+
+               }
+
+           });
+           return false;
+       });
+
+   })
+</script>
+{/block}
