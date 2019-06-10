@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!-- release v4.5.2, copyright 2014 - 2018 Kartik Visweswaran -->
+<!--suppress JSUnresolvedLibraryURL -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>uoload img</title>
+    
+    <link rel="stylesheet" href="/fileupload/bootstrap-3.3.7/dist/css/bootstrap.min.css">
+    <link href="../css/fileinput.css" rel="stylesheet" type="text/css"/>
+
+    <link href="../themes/explorer-fas/theme.css" rel="stylesheet" type="text/css"/>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" ></script>
+    <script src="/fileupload/bootstrap-3.3.7/js/bootstrap.min.js" ></script>
+    <script src="../js/plugins/sortable.js" type="text/javascript"></script>
+    <script src="../js/fileinput.js" type="text/javascript"></script>
+    <script src="../js/locales/fr.js" type="text/javascript"></script>
+    <script src="../js/locales/es.js" type="text/javascript"></script>
+    <script src="../themes/fas/theme.js" type="text/javascript"></script>
+    <script src="../themes/explorer-fas/theme.js" type="text/javascript"></script>
+</head>
+<body>
+	<h1>Bootstrap File Input Examples</h1>
+    <hr>
+   <div class="form-group">
+			<label class="col-sm-2 control-label">图片上传:</label>
+	    	<div class="col-sm-4">
+	       		<input id="file_my_1" name="file_my_1" type="file" class='file-loading'>
+	       		<p class="help-block">支持jpg、jpeg、png格式，大小不超过2.0M</p>
+	    	</div>
+	</div>
+	<script type="text/javascript">
+	function initFileInput(ctrlName,uploadUrl) {    
+	    var control = $('#' + ctrlName); 
+	    control.fileinput({
+	        language: 'zh', //设置语言
+	        uploadUrl: uploadUrl,  //上传地址
+	        showUpload: false, //是否显示上传按钮
+	        showRemove:true,
+	         dropZoneEnabled: false,
+	        showCaption: true,//是否显示标题
+	        allowedPreviewTypes: ['image'],
+                allowedFileTypes: ['image'],
+                allowedFileExtensions:  ['jpg', 'png'],
+                maxFileSize : 2000,
+           	maxFileCount: 1,
+            //initialPreview: [ 
+            		//预览图片的设置
+              //      "<img src='http://127.0.0.1:8080/NewsManageSys/plugin/umeditor1_2_2/jsp/upload/20161030/55061                       477813913474.jpg' class='file-preview-image' alt='肖像图片' title='肖像图片'>",
+            //],
+	        
+	    }).on("filebatchselected", function(event, files) {
+            $(this).fileinput("upload");
+        	})
+        	.on("fileuploaded", function(event, data) {
+        		$("#path").attr("value",data.response);
+    	});
+	}
+	
+	$(function () {
+		
+	    $('#file_my_1').fileinput({
+	        language: 'zh', //设置语言
+	        uploadUrl: "./upload.php",  //上传地址
+	       // showUpload: false, //是否显示上传按钮
+	       // showRemove:true,
+	        // dropZoneEnabled: false,
+	       // showCaption: true,//是否显示标题
+	        //allowedPreviewTypes: ['image'],
+              //  allowedFileTypes: ['image'],
+             //   allowedFileExtensions:  ['jpg', 'png'],
+          //  maxFileSize : 200000,
+           
+            // uploadAsync: true,
+            maxFileCount: 1,
+            showBrowse: false,
+            browseOnZoneClick: true
+            //initialPreview: [ 
+            		//预览图片的设置
+              //      "<img src='http://127.0.0.1:8080/NewsManageSys/plugin/umeditor1_2_2/jsp/upload/20161030/55061                       477813913474.jpg' class='file-preview-image' alt='肖像图片' title='肖像图片'>",
+            //],
+	        
+	    }).on("filebatchselected", function(event, files) {
+            $(this).fileinput("upload");
+        	})
+        	.on("fileuploaded", function(event, data) {
+                console.log(data);
+        		//$("#file_my_1").attr("value",data.response.fileurl);
+    	});
+		
+	})
+	</script>
+
+</body>
+</html>
