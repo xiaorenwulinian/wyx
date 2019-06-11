@@ -64,7 +64,12 @@
                             <tr  style="width: 40px;text-align: center">
                                 <td>{$v['id']}</td>
                                 <td><img src="<?php echo '/uploads/'.$v['ad_thumb_img'];?>" width="50px" alt=""></td>
-                                <td>{$v['ad_title']}</td>
+                                <td>
+
+                                    <a href="javascript:void(0);" class="detail_info" data-id="<?php echo $v['id']; ?>">
+                                        {$v['ad_title']}
+                                    </a>
+                                </td>
                                 <td>{$v['ad_content']}</td>
                                 <td>{$v['ad_url']}</td>
                                 <td>
@@ -94,6 +99,19 @@
 {block name="script"}
 <script>
    $(function () {
+       $('.detail_info').on('click', function(){
+           var id = $(this).attr('data-id');
+           layer.open({
+               type: 2,
+               title: '查看广告详细息',
+               maxmin: true,
+               shadeClose: true, //点击遮罩关闭层
+               area : ['800px' , '520px'],
+               content: "<?php echo url('detailInfoById','',false);?>"+"?id="+id
+           });
+//            layer.msg(oAddrId);
+       });
+
        $('.cur_del').on('click',function () {
            var id = $(this).attr('data-id');
            layer.confirm('确定要删除吗？', {

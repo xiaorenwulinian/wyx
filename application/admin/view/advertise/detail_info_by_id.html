@@ -1,0 +1,233 @@
+{extend name="admin@layout/basic" /}
+{block name="style"}{/block}
+<link href="/bower_components/jquery-file-upload-9.28.0/css/jquery.fileupload.css" rel="stylesheet" type="text/css"/>
+{block name="content"}
+<!-- Content Header (Page header) -->
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title"></h3>
+                </div>
+                <div class="box-body">
+                    <form class="form-horizontal" id="formSubmit" action="">
+                        <input type="hidden" name="id" value="{$advertiseData['id']}">
+                        <div class="form-group">
+                            <label for="ad_title" class="col-sm-2 control-label">广告标题：</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" name="ad_title" id="ad_title" value="{$advertiseData['ad_title']}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label">广告图片</label>
+                            <div class="col-sm-5" >
+                                <button type="button" class="btn btn-primary upload_logo_button "> 上传图片 </button>
+                                <div class="img_show_content" style="margin-top: 10px;">
+                                    <div>
+                                        <a src="javascript:void(0);" data-id="{$advertiseData.id}" onclick="delete_logo_img(this);">删除</a><br>
+                                        <img src="/uploads/{$advertiseData.ad_thumb_img}"/>;
+                                    </div>
+                                </div>
+                                <input id="ad_img" name="ad_img" class="ad_img" type="file" style="display: none">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="ad_url" class="col-sm-2 control-label">跳转链接：</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" rows="2" name="ad_url" id="ad_url">{$advertiseData['ad_url']}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ad_content" class="col-sm-2 control-label">广告内容：</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" rows="3" name="ad_content" id="ad_content">{$advertiseData['ad_content']}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label">是否显示</label>
+                            <div class="col-sm-8">
+                                <label class="radio-inline">
+                                    <input type="radio" name="is_display" class="is_display" value="0" <?php echo $advertiseData['is_display'] == 0 ? 'checked="checked"': ''; ?>> 显示
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="is_display" class="is_display" value="1" <?php echo $advertiseData['is_display'] == 1 ? 'checked="checked"': ''; ?>> 隐藏
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="order_id" class="col-sm-2 control-label">排序：</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="order_id" id="order_id" value="<?php echo $advertiseData['order_id']; ?>">
+                            </div>
+                        </div>
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div style="margin-bottom: 100px;"></div>
+{/block}
+
+{block name="script"}
+<script src="/bower_components/jquery-file-upload-9.28.0/js/vendor/jquery.ui.widget.js" type="text/javascript"></script>
+<script src="/bower_components/jquery-file-upload-9.28.0/js/jquery.fileupload.js" type="text/javascript"></script>
+<script src="/bower_components/jquery-file-upload-9.28.0/js/jquery.iframe-transport.js" type="text/javascript"></script>
+
+
+<script>
+    var logo_path = "<?php echo $advertiseData['ad_img'];?>";
+    var logo_thumb_path = "<?php echo $advertiseData['ad_thumb_img'];?>";
+
+    // 删除单文件
+    function delete_logo_img(cur_this){
+        var ad_id = $(cur_this).attr('data-id');
+        var _this = cur_this;
+        if(confirm('确定要删除吗?')) {
+            $.ajax({
+                type: 'get',
+                url:  "<?php echo url('updateDelImg','',false);?>",
+                dataType: 'json',
+                data: {id : ad_id},
+                success: function(ret){
+                    console.log(ret);
+                    if(ret.code == 0) {
+                        $(_this).parent().remove();
+                        logo_path = '';
+                        logo_thumb_path = '';
+                    } else {
+                        alert(ret.msg);
+                        return false;
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(XMLHttpRequest.responseJSON.msg);
+                    return false;
+                }
+            });
+        }
+        return false;
+    }
+    $(function () {
+        var ad_id = "<?php echo $advertiseData['id'];?>";
+
+        //商品图片，单文件
+        $('.upload_logo_button').on('click',function(){
+            $('#ad_img').click();
+        });
+
+        $('#ad_img').fileupload({
+            autoUpload: true,//是否自动上传
+            url: "{:url('editUploadPic')}",
+            dataType: 'json',
+            add: function (e,data) {
+                $("#ad_img").fileupload(
+                    'option',
+                    'formData',
+                    {'ad_id': ad_id}
+                ); // 传参不能放在初始化语句中，否则只能传递参数的初始化值
+                data.submit();
+            },
+            done: function (e, data) {
+                console.log(data);
+                if(data.result.code == 0) {
+                    logo_path = data.result.logo_file_path;
+                    logo_thumb_path = data.result.logo_file_path_thumb;
+                    var _html ="";
+                    _html +="<div>";
+                    _html +="<a src='javascript:void(0);'data-id='"+ad_id+"' onclick='delete_logo_img(this);'  >删除</a><br>";
+                    _html +="<img src='/uploads/"+data.result.logo_file_path_thumb+"'/>";
+                    _html +="</div>";
+
+                    $('.img_show_content').html(_html);
+                }
+            }
+        });
+
+        $('.curSubmit').on('click',function () {
+
+            var ad_title = $('#ad_title').val();
+            if (ad_title == '' || ad_title.length == 0) {
+                layer.msg("请输入广告标题!", {icon: 5,time:2000});
+                return false;
+            }
+            var ad_url = $('#ad_url').val();
+            if (ad_url == '' ) {
+                layer.msg("请输入跳转路径!", {icon: 5,time:2000});
+                return false;
+            }
+            var ad_content = $('#ad_content').val();
+            if (ad_content == '') {
+                layer.msg("请输入广告内容!", {icon: 5,time:2000});
+                return false;
+            }
+            var is_display = $("input[name='is_display']:checked").val();
+            var order_id = $('#order_id').val();
+
+            var ad_img = logo_path;
+            if (ad_img == '') {
+                layer.msg("请上传图片!", {icon: 5,time:2000});
+                return false;
+            }
+            var url = "<?php echo url('edit','',false);?>";
+//            console.log(ad_id+ad_title+ad_content+is_display+order_id);
+//            return false;
+//            var form_param = $('#formSubmit').serialize();
+            $.ajax({
+                type: 'post',
+                url:  url,
+                dataType: 'json',
+                data: {
+                    id : ad_id,
+                    ad_title : ad_title,
+                    ad_url : ad_url,
+                    ad_content : ad_content,
+                    is_display : is_display,
+                    order_id : order_id,
+                },
+                success: function(ret){
+                    console.log(ret);
+                    if(ret.code == 0) {
+                        layer.msg('修改成功',{
+                            time:1000,
+                            icon: 6,
+                            end:function () {
+                                window.history.back();
+//                               location.reload();
+//                                location.href = "<?php echo url('lst',['page'=>input('get.page',1)],false);?>";
+                            }
+                        })
+                    } else {
+                        layer.msg(ret.msg, {icon: 5,time:1000,});
+                        return false;
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log('---error----\n');
+                    console.log(XMLHttpRequest);
+                    console.log(XMLHttpRequest.status);
+                    console.log(XMLHttpRequest.readyState);
+                    console.log(XMLHttpRequest.responseJSON);
+                    console.log(XMLHttpRequest.responseText);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                    layer.msg(XMLHttpRequest.responseJSON.msg, {icon: 5,time:1000,});
+                    return false;
+
+                }
+
+            });
+            return false;
+        });
+
+    })
+</script>
+{/block}

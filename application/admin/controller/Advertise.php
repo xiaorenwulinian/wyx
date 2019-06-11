@@ -271,26 +271,21 @@ class Advertise extends AdminBase
 
     }
 
-    public function modifyPassword()
+    /**
+     *
+     * 显示详细信息，只读
+     */
+    public function detailInfoById()
     {
-        $admin_id = session('admin_user_id');
-        $admin_data = Db::table('admin')->find($admin_id);
-        if ($this->request->isPost()) {
-            $pwd = $this->request->param('password');
-            $new_pwd = md5($pwd);
-            try {
-                Db::table('admin')->where('id', $admin_id)->update([
-                    'password' => $new_pwd
-                ]);
-            } catch (Exception $e) {
-                return json(['code' => 1, 'msg' => $e->getMessage()]);
-            }
-            return json(['code' => 0, 'msg' => '']);
-        }
+        $id = $this->request->param('id');
 
+        $advertiseData = Db::name('advertise')->find($id);
         $this->assign([
-            'admin_data' => $admin_data
+            'advertiseData' => $advertiseData,
         ]);
+
+        $url = url('lst');
+        $this->setPageBtn('修改广告', '广告列表',$url );
         return $this->fetch();
     }
 }
