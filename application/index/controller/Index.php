@@ -3,6 +3,7 @@
 namespace app\index\controller;
 
 use app\common\controller\ExcelUnit;
+use app\common\lib\StringUnit;
 use think\Controller;
 use think\Db;
 
@@ -31,6 +32,10 @@ class Index extends Controller
         $excel = new ExcelUnit();
         $excel->excelExport($data,$header,$field,$file_name);
 
+    }
+    public function testString() {
+        $ret = StringUnit::randCode(4,true);
+        dump($ret);
     }
     public function index()
     {
