@@ -25,10 +25,30 @@ class Article extends AdminBase
         $default_page_size = 10; // 每一页默认显示的条数
 
         $where = [];
-        $keyword = input('keyword');
-        if ($keyword) {
-            $where[] = ['art_title','like','%'. $keyword . '%'];
+        $art_title = input('art_title');
+        if ($art_title) {
+            $where[] = ['art_title','like','%'. $art_title . '%'];
         }
+        $begin_time = input('begin_time');
+        $end_time = input('end_time');
+        if ($begin_time && $end_time) {
+            //开始时间 大于 结束时间 ，特殊情况 可以不处理，或者将两个时间替换
+            if (($end_time) < $begin_time) {
+                list($end_time,$begin_time) = [$begin_time,$end_time];
+            }
+            $begin_time_int = strtotime(date('Y-m-d',strtotime($begin_time)) . ' 00:00:00');
+            $end_time_int = strtotime(date('Y-m-d',strtotime($end_time)) . ' 23:59:59');
+            $where[] = ['add_time','between',[$begin_time_int,$end_time_int]];
+        } elseif ($begin_time) {
+            //只有开始时间
+            $begin_time_int = strtotime(date('Y-m-d',strtotime($begin_time)) . ' 00:00:00');
+            $where[] = ['add_time','>=',$begin_time_int];
+        } elseif ($end_time) {
+            // 只有结束时间
+            $end_time_int = strtotime(date('Y-m-d',strtotime($end_time)) . ' 23:59:59');
+            $where[] = ['add_time','<=',$end_time_int];
+        }
+
         $page_size = input('page_size',$default_page_size);
         $page_size_select = page_size_select($page_size); //生成下拉选择页数框
         $list = ArticleModel::where($where)->paginate($page_size,false,['query' => request()->param()]);
