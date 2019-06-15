@@ -13,6 +13,20 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ExcelUnit
 {
+    protected static $instance ;
+    private function __construct()
+    {
+
+    }
+
+    public static function getInstance()
+    {
+        if (is_null(self::$instance)) {
+            self::$instance = new static();
+        }
+        return self::$instance;
+    }
+
     /**
      * excel 导出
      * @param $data 导出的数据集，二维数组
@@ -20,7 +34,7 @@ class ExcelUnit
      * @param $field 数组的每一列标题对应的字段
      * @param $file_name 导出的文件名称
      */
-    public static function excelExport($data,$header,$field,$file_name)
+    public function excelExport($data,$header,$field,$file_name)
     {
         /*
         // 导出的数据集，二维数组
@@ -74,4 +88,59 @@ class ExcelUnit
         exit;
 
     }
+
+    /**
+     * 原生　php excel 导出
+     * @param $data 导出的数据集，二维数组
+     * @param $header 第一行标题头
+     * @param $field 数组的每一列标题对应的字段
+     * @param $file_name 导出的文件名称
+     */
+    public function rawExcelExport($data,$header,$field,$file_name)
+    {
+        /*
+        // 导出的数据集，二维数组
+        $data = [
+            ['id'=>1,'art_title'=>'aaa','add_time'=>'2019-05-11'],
+            ['id'=>2,'art_title'=>'bbb','add_time'=>'2019-05-12'],
+            ['id'=>3,'art_title'=>'ccc','add_time'=>'2019-05-13'],
+            ['id'=>4,'art_title'=>'ddd','add_time'=>'2019-05-14'],
+        ];
+        //第一行标题头
+        $header = [
+            'id值','添加时间','标题'
+        ];
+        // 数组的每一列标题对应的字段
+        $field = [
+            'id','add_time', 'art_title'
+        ];
+        //导出的文件名称
+        $file_name = '文章列表'.date('Y-m-d-H_i_s');
+        */
+        $table = "<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />";
+        $table .= "<table  border='1'>";
+        // 标题头部信息
+        $table .= "<tr>";
+        foreach ($header as $header_name) {
+            $table .= "<td>{$header_name}</td>";
+        }
+        $table .= "</tr>";
+        // 渲染数据
+        foreach ($data as $cur_data) {
+            $table .= "<tr>";
+            foreach ($field as $k=>$field_value) {
+                $table .= "<td>{$cur_data[$field_value]}</td>";
+            }
+            $table .= "</tr>";
+        }
+        $table .= "</table>";
+        header("Pragma: public");
+        header("Content-type:application/vnd.ms-excel");
+        header("Content-Disposition: inline;filename={$file_name}.xls");
+
+        echo $table;
+        die;
+    }
+
+
 }

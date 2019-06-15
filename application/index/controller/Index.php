@@ -30,8 +30,9 @@ class Index extends Controller
         //导出的文件名称
         $file_name = '文章列表test';
         // 统一使用 app/common/lib/ExcelUnit  类库
-        $excel = new ExcelUnit();
-        $excel->excelExport($data,$header,$field,$file_name);
+        $excel =  ExcelUnit::getInstance();
+        $excel->rawExcelExport($data,$header,$field,$file_name);
+//        $excel->excelExport($data,$header,$field,$file_name);
 
     }
     public function testString() {
