@@ -1,6 +1,6 @@
 #database
 mysql_hostname=127.0.0.1
-mysql_database=common
+mysql_database=wyx
 mysql_username=root
 mysql_password=password
 mysql_hostport=3306

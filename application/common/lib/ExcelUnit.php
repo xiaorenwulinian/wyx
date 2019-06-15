@@ -5,14 +5,13 @@
  * Date: 2019\6\12 0012
  * Time: 8:16
  */
-namespace app\common\controller;
+namespace app\common\lib;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use think\Controller;
 
-class ExcelUnit extends Controller
+class ExcelUnit
 {
     /**
      * excel 导出

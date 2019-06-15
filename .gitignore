@@ -2,6 +2,7 @@
 /.vscode
 *.log
 .env
+./vendor/*
 .DS_Store
 ./runtime/cache/*
 ./runtime/log/*
