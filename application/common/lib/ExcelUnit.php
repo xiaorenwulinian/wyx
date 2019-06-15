@@ -8,6 +8,7 @@
 namespace app\common\lib;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -19,6 +20,10 @@ class ExcelUnit
 
     }
 
+    /**
+     * 获取实例对象，单例模式
+     * @return static
+     */
     public static function getInstance()
     {
         if (is_null(self::$instance)) {
@@ -140,6 +145,46 @@ class ExcelUnit
 
         echo $table;
         die;
+    }
+
+
+    /**
+     * Description : excel 导入
+     * @param $uploadfile 导出的 excel 文件地址
+     * @return array  返回的excel解析的数据
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
+    public function excelImport($uploadfile)
+    {
+
+//        $uploadfile = Env::get('root_path').'public/excel001.xlsx';
+        $inputFileType = IOFactory::identify($uploadfile); //传入Excel路径
+        $excelReader   = IOFactory::createReader($inputFileType); //Xlsx
+        $PHPExcel      = $excelReader->load($uploadfile); // 载入excel文件
+        $sheet         = $PHPExcel->getSheet(0); // 读取第一個工作表
+        $data = $sheet->toArray();
+        return $data; // --- 直接返回数组数据
+    }
+
+    /**
+     * Description : excel 导入 去除头部信息
+     * @param $uploadfile 导出的 excel 文件地址
+     * @return array 返回的excel解析的数据
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
+    public function excelImportNoHeader($uploadfile)
+    {
+
+//        $uploadfile = Env::get('root_path').'public/excel001.xlsx';
+        $inputFileType = IOFactory::identify($uploadfile); //传入Excel路径
+        $excelReader   = IOFactory::createReader($inputFileType); //Xlsx
+        $PHPExcel      = $excelReader->load($uploadfile); // 载入excel文件
+        $sheet         = $PHPExcel->getSheet(0); // 读取第一個工作表
+        $data = $sheet->toArray();
+        unset($data[0]);
+        return $data; // --- 直接返回数组数据
     }
 
 
