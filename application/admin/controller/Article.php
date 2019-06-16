@@ -21,49 +21,13 @@ class Article extends AdminBase
 
     public function lst()
     {
-        //        $articleData = Db::name('article')->select();
         $default_page_size = 10; // 每一页默认显示的条数
-        $where = [];
-        $art_title = input('art_title');
-        if ($art_title) {
-            $where[] = ['a.art_title','like','%'. $art_title . '%'];
-        }
-        $type_id = input('type_id');
-        if ($type_id) {
-            $where[] = ['a.type_id','=', $type_id];
-        }
-        $begin_time = input('begin_time');
-        $end_time = input('end_time');
-        if ($begin_time && $end_time) {
-            //开始时间 大于 结束时间 ，特殊情况 可以不处理，或者将两个时间替换
-            if (($end_time) < $begin_time) {
-                list($end_time,$begin_time) = [$begin_time,$end_time];
-            }
-            $begin_time_int = strtotime(date('Y-m-d',strtotime($begin_time)) . ' 00:00:00');
-            $end_time_int = strtotime(date('Y-m-d',strtotime($end_time)) . ' 23:59:59');
-            $where[] = ['a.add_time','between',[$begin_time_int,$end_time_int]];
-        } elseif ($begin_time) {
-            //只有开始时间
-            $begin_time_int = strtotime(date('Y-m-d',strtotime($begin_time)) . ' 00:00:00');
-            $where[] = ['a.add_time','>=',$begin_time_int];
-        } elseif ($end_time) {
-            // 只有结束时间
-            $end_time_int = strtotime(date('Y-m-d',strtotime($end_time)) . ' 23:59:59');
-            $where[] = ['a.add_time','<=',$end_time_int];
-        }
-
         $page_size = input('page_size',$default_page_size);
         $page_size_select = page_size_select($page_size); //生成下拉选择页数框
         $cat_data = Db::name('category')->select();
-        $select_filed = [
-            'a.id','a.art_title','a.art_desc','a.type_id','c.title AS cat_title','a.add_time'
-        ];
-        $list = ArticleModel::alias('a')
-            ->leftJoin('category c','a.type_id = c.id')
-            ->where($where)
-            ->field($select_filed)
-            ->order('a.id','desc')
-            ->paginate($page_size,false,['query' => request()->param()]);
+
+        $article_model = new ArticleModel();
+        $list = $article_model->search($page_size);
         $page = $list->render();
         $cur_page = input('page',1);
         $url = url('add',['page'=>$cur_page]);
