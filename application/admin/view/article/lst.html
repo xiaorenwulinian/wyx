@@ -18,6 +18,9 @@
         padding: 6px 12px;
         /*text-align: right;*/
     }
+    .common_search input,.common_search select{
+        margin-bottom: 10px;
+    }
 </style>
 
 {/block}
@@ -40,6 +43,13 @@
             <input type="text" class="form-control begin_time" name="begin_time" placeholder="开始时间" value="{:input('begin_time')}"  autocomplete="off" />
             --
             <input type="text" class="form-control end_time" name="end_time"  placeholder="结束时间" value="{:input('end_time')}"  autocomplete="off" />
+            <select name="type_id" class="form-control">
+                <option value="">请选择类别</option>
+                <?php foreach($cat_data as $v): ?>
+                <?php $selected = $v['id'] == input('type_id','') ? 'selected="selected"': ''; ?>
+                <option value="{$v['id']}" {$selected}>{$v['title']}</option>
+                <?php endforeach;?>
+            </select>
             <input  type="hidden" name="page_size" id="cur_show_page" value="{$page_size}"/>
             <input class="btn btn-flat btn-primary" type="submit" value="搜索">
             <!--<input class="btn btn-flat btn-primary m_10" onclick="location.href='{:url(\'lst\')}'" type="button" value="显示全部">-->
@@ -61,6 +71,7 @@
                         <tr >
                             <th style="text-align: center">多选</th>
                             <th style="text-align: center">id</th>
+                            <th style="text-align: center">所属类别</th>
                             <th style="text-align: center">标题</th>
                             <th style="text-align: center">描述</th>
                             <th style="text-align: center">操作</th>
@@ -71,6 +82,7 @@
                             <tr  style="width: 40px;text-align: center">
                                 <td><input type="checkbox" class="multi_select_input" name="multi_select[]" value="{$v['id']}"/></td>
                                 <td>{$v['id']}</td>
+                                <td>{$v['cat_title']}</td>
                                 <td>{$v['art_title']}</td>
                                 <td>{$v['art_desc']}</td>
                                 <td>
