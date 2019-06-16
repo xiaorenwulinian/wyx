@@ -3,6 +3,7 @@
 namespace app\index\controller;
 
 use app\common\lib\ExcelUnit;
+use app\common\lib\MailUnit;
 use app\common\lib\StringUnit;
 use think\Controller;
 use think\Db;
@@ -59,5 +60,20 @@ class Test extends Controller
         $ret = StringUnit::randCode(4,true);
         dump($ret);
     }
+
+    /**
+     * 测试邮件发送
+     */
+    public function testmail()
+    {
+        $to = '2806044627@qq.com';  //收件人
+        $subject = 'test mail send';  // 标题
+        $message = 'the content can not empty'; // 内容
+
+        $mail = MailUnit::sendMail($to,$subject,$message);
+        dump($mail);
+    }
+
+
 
 }

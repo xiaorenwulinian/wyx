@@ -4,3 +4,10 @@ mysql_database=wyx
 mysql_username=root
 mysql_password=password
 mysql_hostport=3306
+
+#email_info
+MAIL_ADDRESS=xxx@163.com
+MAIL_FROM_NICKNAME=lcl
+MAIL_HOST=smtp.163.com
+MAIL_USER_NAME=username
+MAIL_PASSWORD=pwd
