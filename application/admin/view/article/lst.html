@@ -43,7 +43,7 @@
             <input  type="hidden" name="page_size" id="cur_show_page" value="{$page_size}"/>
             <input class="btn btn-flat btn-primary" type="submit" value="搜索">
             <!--<input class="btn btn-flat btn-primary m_10" onclick="location.href='{:url(\'lst\')}'" type="button" value="显示全部">-->
-            <!--<input class="btn btn-flat btn-warning m_10 select_del" type="button" value="批量删除">-->
+            <input class="btn btn-flat btn-warning multi_del" type="button" value="批量删除">
             <!--<a class="btn btn-flat btn-success m_10 f_r" href="{:url('add')}"><i class="fa fa-plus m-r-10"></i>添 加</a>-->
         </form>
     </div>
@@ -59,6 +59,7 @@
                     <table id="example2" class="table table-bordered table-hover">
                         <thead>
                         <tr >
+                            <th style="text-align: center">多选</th>
                             <th style="text-align: center">id</th>
                             <th style="text-align: center">标题</th>
                             <th style="text-align: center">描述</th>
@@ -68,6 +69,7 @@
                         <tbody>
                             <?php foreach($list as $v):?>
                             <tr  style="width: 40px;text-align: center">
+                                <td><input type="checkbox" class="multi_select_input" name="multi_select[]" value="{$v['id']}"/></td>
                                 <td>{$v['id']}</td>
                                 <td>{$v['art_title']}</td>
                                 <td>{$v['art_desc']}</td>
@@ -211,6 +213,45 @@
            $('#form_search').trigger('submit');
            return false;
           
+       });
+
+       /**
+        * 批量删除
+        */
+       $('.multi_del').on('click',function () {
+           var has_checked  = [];
+           $("input[name='multi_select[]']:checked").each(function () {
+               has_checked.push($(this).val());
+           });
+           var has_checked_str = has_checked.join(',');
+           if (has_checked_str == '' || has_checked_str.length == 0) {
+               alert('请勾选删除项！');
+               return false;
+           }
+           var url = "{:url('multiDelete','',false)}";
+           $.ajax({
+               type: 'get',
+               url:  url,
+               dataType: 'json',
+               data: {
+                   ids : has_checked_str
+               },
+               success: function(ret){
+                   console.log(ret);
+                   if(ret.code == 0) {
+                       layer.msg('删除成功',{
+                           time:1000, icon: 6,
+                           end:function () {
+                               location.href = location.href;
+                           }
+                       })
+                   } else {
+                       layer.msg(ret.msg, {icon: 5,time:1000,});
+                       return false;
+                   }
+               }
+           });
+           return false;
        });
    })
 </script>

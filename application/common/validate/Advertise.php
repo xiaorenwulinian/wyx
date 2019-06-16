@@ -9,7 +9,7 @@ use think\Validate;
  * Date: 2018\12\22 0022
  * Time: 16:29
  */
-class Article extends Validate {
+class Advertise extends Validate {
     //验证规则
     protected $rule = [
         'ad_title'  =>  'require|max:2550',

@@ -23,7 +23,6 @@ class Article extends AdminBase
     {
         //        $articleData = Db::name('article')->select();
         $default_page_size = 10; // 每一页默认显示的条数
-
         $where = [];
         $art_title = input('art_title');
         if ($art_title) {
@@ -170,9 +169,27 @@ class Article extends AdminBase
             }
             return  json(['code'=>0, 'msg'=>'']);
         }
-        return  json(['code'=>1, 'msg'=>'非法入侵']);
+
     }
 
+
+    /**
+     * 批量删除
+     */
+    public function multiDelete()
+    {
+        $ids = $this->request->param('ids');
+        if (empty($ids) || is_array($ids)) {
+            return  json(['code'=>1, 'msg'=>'it is not matching with multiple delete!']);
+        }
+        $id_arr = explode(',',$ids);
+        try{
+            articleModel::destroy($id_arr);
+        }catch (\Exception $e) {
+            return  json(['code'=>1, 'msg'=>$e->getMessage()]);
+        }
+        return  json(['code'=>0, 'msg'=>'']);
+    }
 
     public function edit_sort()
     {
