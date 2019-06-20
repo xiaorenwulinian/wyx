@@ -63,7 +63,9 @@
                             <?php foreach($list as $v):?>
                             <tr  style="width: 40px;text-align: center">
                                 <td>{$v['id']}</td>
-                                <td><img src="<?php echo '/uploads/'.$v['ad_thumb_img'];?>" width="50px" alt=""></td>
+                                <td>
+                                    {:show_image($v['ad_thumb_img'],'50px')}
+                                </td>
                                 <td>
 
                                     <a href="javascript:void(0);" class="detail_info" data-id="<?php echo $v['id']; ?>">

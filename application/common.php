@@ -24,3 +24,30 @@ function page_size_select($page_size=0){
     $str .= '</select>';
     return $str;
 }
+
+/**
+ * 图片展示
+ * @param string $url
+ * @param string $width
+ * @param string $height
+ * @param string $alt
+ * @return string
+ */
+function show_image($url = '', $width = '', $height ='' , $alt='' ) {
+    if (empty($url)) {
+        $url = "/favicon.ico";
+    } else {
+        $url = '/uploads/' . $url;
+    }
+    if (!empty($width)) {
+        $width = "width = '{$width}'";
+    }
+
+    if (!empty($width)) {
+        $height = "height = '{$height}'";
+    }
+    if (empty($alt)) {
+        $alt  = '图片加载中';
+    }
+    return "<img src='{$url}' $width $height alt='{$alt}' />";
+}
