@@ -69,7 +69,7 @@
                     <table id="example2" class="table table-bordered table-hover">
                         <thead>
                         <tr >
-                            <th style="text-align: center">多选</th>
+                            <th style="text-align: center"> <input type="checkbox" name="is_multi_select"  class="is_multi_select"> </th>
                             <th style="text-align: center">id</th>
                             <th style="text-align: center">所属类别</th>
                             <th style="text-align: center">标题</th>
@@ -136,6 +136,17 @@
            var id = $(this).attr('data-id');
            var url = "<?php echo url('delete','',false);?>";
            delete_one(url, id);
+       });
+       $('.is_multi_select').on('click',function () {
+           if ($(this).is(':checked')) {
+               $("input[name='multi_select[]']").each(function () {
+                   $(this).prop("checked","checked");
+               });
+           } else {
+               $("input[name='multi_select[]']").each(function () {
+                   $(this).prop('checked',false);
+               });
+           }
        });
 
        /**
