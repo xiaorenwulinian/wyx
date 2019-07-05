@@ -12,6 +12,11 @@
 // [ 应用入口文件 ]
 namespace think;
 
+//$redis = new \Redis();
+//$redis->connect('127.0.0.1','6379');
+//echo $redis->get('age');
+//
+//exit;
 // 加载基础文件
 require __DIR__ . '/../thinkphp/base.php';
 

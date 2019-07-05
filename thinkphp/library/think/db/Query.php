@@ -1782,6 +1782,10 @@ class Query
 
             $bind    = $this->bind;
             $total   = $this->count();
+            // 解决批量删除当前页，返回上一页无数据情况
+            if ($total/$listRows < $page) {
+                $page = $total/$listRows;
+            }
             $results = $this->options($options)->bind($bind)->page($page, $listRows)->select();
         } elseif ($simple) {
             $results = $this->limit(($page - 1) * $listRows, $listRows + 1)->select();

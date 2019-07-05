@@ -15,7 +15,7 @@
 function page_size_select($page_size=0){
     $str  = '<select class="form-control page_size_select">';
     $all_page  = [
-        5,10,20,50,100
+        2,5,10,20,50,100
     ];
     foreach ($all_page as $cur_page) {
         $has_selected = $page_size == $cur_page ? "selected='selected'" : '';

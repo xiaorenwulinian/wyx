@@ -133,7 +133,7 @@ class Think
 
         $depr = $this->config['view_depr'];
 
-        if (0 !== strpos($template, '/')) {
+         if (0 !== strpos($template, '/')) {
             $template   = str_replace(['/', ':'], $depr, $template);
             $controller = Loader::parseName($request->controller());
 

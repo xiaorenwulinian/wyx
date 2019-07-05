@@ -68,38 +68,17 @@
 {/block}
 
 {block name="script"}
+<script src="/admin/js/admin_common.js" type="text/javascript" ></script>
+
 <script>
+
    $(function () {
        $('.cur_del').on('click',function () {
            var id = $(this).attr('data-id');
-           layer.confirm('确定要删除吗？', {
-               btn: ['确定','取消']
-           }, function(){
-               var url = "<?php echo url('flowerUse/delete','',false);?>";
-               $.ajax({
-                   type: 'get',
-                   url:  url,
-                   dataType: 'json',
-                   data: {id:id},
-                   success: function(ret){
-                       console.log(ret);
-                       if(ret.code == 0) {
-                           layer.msg('删除成功',{
-                               time:1000, icon: 6,
-                               end:function () {
-                                   location.href = location.href;
-                               }
-                           })
-                       } else {
-                           layer.msg(ret.msg, {icon: 5,time:1000,});
-                           return false;
-                       }
-                   }
-               });
-           }, function(){
-           });
-           return false;
+           var url = "<?php echo url('delete','',false);?>";
+           delete_one(url, id);
        });
+
        $('.edit_use').on('click',function () {
            var id = $(this).attr('data-id');
            var url = "<?php echo url('ajaxEditAdminUse','',false);?>";

@@ -110,6 +110,7 @@
 {/block}
 
 {block name="script"}
+<script src="/admin/js/admin_common.js" type="text/javascript" ></script>
 
 <!--时间插件-->
 <script src="/bower_components/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js" type="text/javascript"></script>
@@ -128,36 +129,34 @@
            language : 'zh-CN'
        });
 
+       /**
+        * 删除单个
+        */
        $('.cur_del').on('click',function () {
            var id = $(this).attr('data-id');
-           layer.confirm('确定要删除吗？', {
-               btn: ['确定','取消']
-           }, function(){
-               var url = "<?php echo url('delete','',false);?>";
-               $.ajax({
-                   type: 'get',
-                   url:  url,
-                   dataType: 'json',
-                   data: {id:id},
-                   success: function(ret){
-                       console.log(ret);
-                       if(ret.code == 0) {
-                           layer.msg('删除成功',{
-                               time:1000, icon: 6,
-                               end:function () {
-                                   location.href = location.href;
-                               }
-                           })
-                       } else {
-                           layer.msg(ret.msg, {icon: 5,time:1000,});
-                           return false;
-                       }
-                   }
-               });
-           }, function(){
-           });
-           return false;
+           var url = "<?php echo url('delete','',false);?>";
+           delete_one(url, id);
        });
+
+       /**
+        * 批量删除
+        */
+       $('.multi_del').on('click',function () {
+           var has_checked  = [];
+           $("input[name='multi_select[]']:checked").each(function () {
+               has_checked.push($(this).val());
+           });
+           var has_checked_str = has_checked.join(',');
+           if (has_checked_str == '' || has_checked_str.length == 0) {
+               alert('请勾选删除项！');
+               return false;
+           }
+           var url = "{:url('multiDelete','',false)}";
+
+           delete_multiply(url, has_checked_str);
+
+       });
+
        $('.edit_use').on('click',function () {
            var id = $(this).attr('data-id');
            var url = "<?php echo url('ajaxEditAdminUse','',false);?>";
@@ -227,44 +226,7 @@
           
        });
 
-       /**
-        * 批量删除
-        */
-       $('.multi_del').on('click',function () {
-           var has_checked  = [];
-           $("input[name='multi_select[]']:checked").each(function () {
-               has_checked.push($(this).val());
-           });
-           var has_checked_str = has_checked.join(',');
-           if (has_checked_str == '' || has_checked_str.length == 0) {
-               alert('请勾选删除项！');
-               return false;
-           }
-           var url = "{:url('multiDelete','',false)}";
-           $.ajax({
-               type: 'get',
-               url:  url,
-               dataType: 'json',
-               data: {
-                   ids : has_checked_str
-               },
-               success: function(ret){
-                   console.log(ret);
-                   if(ret.code == 0) {
-                       layer.msg('删除成功',{
-                           time:1000, icon: 6,
-                           end:function () {
-                               location.href = location.href;
-                           }
-                       })
-                   } else {
-                       layer.msg(ret.msg, {icon: 5,time:1000,});
-                       return false;
-                   }
-               }
-           });
-           return false;
-       });
+
    })
 </script>
 {/block}
